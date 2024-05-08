@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday/v2"
@@ -30,7 +31,9 @@ const (
 
 func main() {
 	filename := flag.String("file", "", "markdown file to preview")
-	preview := flag.Bool("preview", false, "directly preview in browser")
+	skipPreview := flag.Bool("skip", false, "directly preview in browser")
+	retain := flag.Bool("retain", false, "delete the converted file")
+
 	flag.Parse()
 
 	if *filename == "" {
@@ -38,7 +41,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := run(*filename, *preview)
+	err := run(*filename, *skipPreview, *retain)
 
 	if err != nil {
 		log.Fatal(err)
@@ -46,7 +49,7 @@ func main() {
 	}
 }
 
-func run(file string, skipPreview bool) error {
+func run(file string, skipPreview bool, deleteFile bool) error {
 	input, err := os.ReadFile(file)
 
 	if err != nil {
@@ -82,6 +85,12 @@ func run(file string, skipPreview bool) error {
 	if skipPreview {
 		return nil
 	}
+
+	if deleteFile {
+		return nil
+	}
+
+	defer os.Remove(outName)
 
 	return preview(outName)
 }
@@ -125,5 +134,8 @@ func preview(file string) error {
 	// so the string would be "/c start file"
 	args = append(args, file)
 
-	return exec.Command(cmd, args...).Run()
+	err := exec.Command(cmd, args...).Run()
+	time.Sleep(2 * time.Second)
+
+	return err
 }
