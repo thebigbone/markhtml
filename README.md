@@ -15,6 +15,6 @@
     directly preview in browser
 ```
 
-`-file`: specify the markdown file.
-`-retain`: keep the generated file. by default, it is deleted.
+`-file`: specify the markdown file.  
+`-retain`: keep the generated file. by default, it is deleted.  
 `-skip`: to skip the preview
