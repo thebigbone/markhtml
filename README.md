@@ -18,3 +18,5 @@
 `-file`: specify the markdown file.  
 `-retain`: keep the generated file. by default, it is deleted.  
 `-skip`: to skip the preview
+
+All the outputs will be generated in `output` folder. The file names are randomized.
