@@ -7,16 +7,19 @@
 ### Flags
 
 ```
+-delete
+    delete the converted html file
 -file string
-    markdown file to preview
--retain
-    delete the converted file
--skip
+    markdown file
+-pdf
+    export to pdf file
+-preview
     directly preview in browser
 ```
 
 `-file`: specify the markdown file.  
-`-retain`: keep the generated file. by default, it is deleted.  
-`-skip`: to skip the preview
+`-delete`: delete the converted html file.
+`-pdf`: export it as pdf.
+`-preview`: directly preview in browser.
 
 All the outputs will be generated in `output` folder. The file names are randomized.

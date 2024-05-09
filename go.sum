@@ -1,3 +1,7 @@
+github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.2 h1:enQwehstpeaAnsyse1Aqb6r0sU5UJbiNvIqVmPo+KWI=
+github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.2/go.mod h1:SQq4xfIdvf6WYKSDxAJc+xOJdolt+/bc1jnQKMtPMvQ=
+github.com/adrg/go-wkhtmltopdf v0.3.0 h1:Zy/bbS6fPlAzuogW5uKa/sLX+SNWwV2DvVued0ZD55c=
+github.com/adrg/go-wkhtmltopdf v0.3.0/go.mod h1:PabO59E2w5GMKC8apqcXmf5rZZmiydIP3H1Wb4Uox6I=
 github.com/aymerick/douceur v0.2.0 h1:Mv+mAeH1Q+n9Fr+oyamOlAkUNPWPlA8PPGR0QAaYuPk=
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
 github.com/gorilla/css v1.0.0 h1:BQqNyPTi50JCFMTw/b67hByjMVXZRwGha6wxVGkeihY=

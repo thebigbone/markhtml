@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday/v2"
 )
@@ -30,9 +31,10 @@ const (
 )
 
 func main() {
-	filename := flag.String("file", "", "markdown file to preview")
-	skipPreview := flag.Bool("skip", false, "directly preview in browser")
-	retain := flag.Bool("retain", false, "delete the converted file")
+	filename := flag.String("file", "", "markdown file")
+	preview := flag.Bool("preview", false, "directly preview in browser")
+	delete := flag.Bool("delete", false, "delete the converted html file")
+	pdf := flag.Bool("pdf", false, "export to pdf file")
 
 	flag.Parse()
 
@@ -41,7 +43,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := run(*filename, *skipPreview, *retain)
+	err := run(*filename, *preview, *delete, *pdf)
 
 	if err != nil {
 		log.Fatal(err)
@@ -49,7 +51,7 @@ func main() {
 	}
 }
 
-func run(file string, skipPreview bool, deleteFile bool) error {
+func run(file string, previewFile bool, deleteFile bool, exportPDF bool) error {
 	input, err := os.ReadFile(file)
 
 	if err != nil {
@@ -59,8 +61,8 @@ func run(file string, skipPreview bool, deleteFile bool) error {
 
 	htmlData := parseContent(input)
 
-	if _, err := os.Stat("output"); os.IsNotExist(err) {
-		err = os.Mkdir("output", os.ModePerm)
+	if _, err := os.Stat("output_html"); os.IsNotExist(err) {
+		err = os.Mkdir("output_html", os.ModePerm)
 
 		if err != nil {
 			log.Fatal(err)
@@ -68,7 +70,7 @@ func run(file string, skipPreview bool, deleteFile bool) error {
 
 	}
 
-	temp, err := os.CreateTemp("./output", "markdown*.html")
+	temp, err := os.CreateTemp("./output_html", "markdown*.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,17 +84,18 @@ func run(file string, skipPreview bool, deleteFile bool) error {
 		return err
 	}
 
-	if skipPreview {
-		return nil
+	if exportPDF {
+		exportPdf(outName)
+	}
+
+	if previewFile {
+		preview(outName)
 	}
 
 	if deleteFile {
-		return nil
+		defer os.Remove(outName)
 	}
-
-	defer os.Remove(outName)
-
-	return preview(outName)
+	return nil
 }
 
 func parseContent(input []byte) []byte {
@@ -138,4 +141,49 @@ func preview(file string) error {
 	time.Sleep(2 * time.Second)
 
 	return err
+}
+
+// https://github.com/SebastiaanKlippert/go-wkhtmltopdf#usage
+func exportPdf(file string) {
+	pdfg, err := wkhtmltopdf.NewPDFGenerator()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if _, err := os.Stat("output_pdf"); os.IsNotExist(err) {
+		err = os.Mkdir("output_pdf", os.ModePerm)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	pdfg.Dpi.Set(300)
+	pdfg.Grayscale.Set(true)
+
+	html_file := wkhtmltopdf.NewPage(file)
+
+	html_file.FooterRight.Set("[page]")
+	html_file.FooterFontSize.Set(10)
+	html_file.Zoom.Set(0.95)
+
+	pdfg.AddPage(html_file)
+
+	// Create PDF document in internal buffer
+	err = pdfg.Create()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	temp, err := os.CreateTemp("./output_pdf", "pdf*.pdf")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	temp.Close()
+	outName := temp.Name()
+	err = pdfg.WriteFile(outName)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
